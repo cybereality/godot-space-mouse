@@ -1,7 +1,7 @@
 # Godot Space Mouse : Plug-In For Godot Engine
 Plug-in to add support for 3Dconnexion Space Mouse and Space Navigator 3D mice input devices. Control the Godot Engine editor viewport camera with 6DOF (6 degrees of freedom). Freely translate the camera position and also rotate along the yaw, pitch, and roll axes.
 
-![Screenshot](ScreenShots/Godot_Space_Mouse_Promo.jpg)
+![Screenshot](screenshots/Godot_Space_Mouse_Promo.jpg)
 
 ## INSTALLATION
 
