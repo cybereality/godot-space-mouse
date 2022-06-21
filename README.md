@@ -13,6 +13,8 @@ For manual install, download the `addons` folder from this repository and copy i
 
 * Place the `addons` folder, with all contents, into your Godot project root directory.
 * To enable the plug-in, click `Project` `Project Settings` `Plugins` and check `Enable` next to the `Godot Space Mouse` entry.
+* On Linux you will need to allow HID access via udev rules. First, download the file `70-space-mouse.rules` and place this file in the correct directory for your distro, such as `/etc/udev/rules.d/`. Then replug your Space Mouse hardware or run `sudo udevadm control --reload-rules && sudo udevadm trigger` to update the rules.
+* For macOS, you must uninstall the 3Dconnexion drivers, as they're incompatible with the plug-in.
 * Please note, a Space Mouse or Space Navigator hardware device from 3Dconnexion is required.
 
 ## LICENSE
