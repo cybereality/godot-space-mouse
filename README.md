@@ -17,6 +17,27 @@ For manual install, download the `addons` folder from this repository and copy i
 * For macOS, you must uninstall the 3Dconnexion drivers, as they're incompatible with the plug-in.
 * Please note, a Space Mouse or Space Navigator hardware device from 3Dconnexion is required.
 
+## BUILDING FROM SOURCE
+
+* Download `libspacemouse.c` from the `src` folder.
+* Get dependencies for [Godot GDNative](https://docs.godotengine.org/en/stable/tutorials/scripting/gdnative/gdnative_c_example.html) and [HIDAPI](https://github.com/libusb/hidapi). 
+
+### WINDOWS
+
+* `cl /Folibspacemouse.obj /c libspacemouse.c /nologo -EHsc -DNDEBUG /MD /I ..\godot-headers /I ..\hidapi-win\include`
+* `link /nologo /dll /out:libspacemouse.dll /implib:libspacemouse.lib libspacemouse.obj /LIBPATH:..\hidapi-win\x64 hidapi.lib`
+
+### LINUX
+
+* `gcc -std=c11 -fPIC -c -I ../godot-headers -I /usr/include/hidapi libspacemouse.c -o libspacemouse.o`
+* `gcc -shared libspacemouse.o -o libspacemouse.so -lhidapi-hidraw`
+
+### MAC
+
+* `gcc -std=c11 -fPIC -c -I ../godot-headers -I ../hidapi-hidapi-0.12.0/hidapi -I ../hidapi-hidapi-0.12.0/mac libspacemouse.c -o libspacemouse.o`
+* `gcc -shared libspacemouse.o -o libspacemouse.dylib -L . -lhidapi.0`
+* `install_name_tool -change @rpath/libhidapi.0.dylib @loader_path/libhidapi.0.dylib libspacemouse.dylib`
+
 ## LICENSE
 
 MIT License
