@@ -1,0 +1,18 @@
+[general]
+
+reloadable=false
+singleton=false
+load_once=true
+symbol_prefix="godot_"
+
+[entry]
+
+OSX.64="res://addons/spacemouse/bin/libspacemouse.dylib"
+Windows.64="res://addons/spacemouse/bin/libspacemouse.dll"
+X11.64="res://addons/spacemouse/bin/libspacemouse.so"
+
+[dependencies]
+
+OSX.64=[  ]
+Windows.64=[  ]
+X11.64=[  ]
