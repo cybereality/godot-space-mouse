@@ -1,0 +1,73 @@
+[gd_scene format=2]
+
+[node name="Space" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+
+[node name="UI" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_bottom = 1.0
+margin_left = -64.0
+margin_right = 64.0
+
+[node name="SpacerTop" type="Control" parent="UI"]
+margin_right = 128.0
+margin_bottom = 6.0
+rect_min_size = Vector2( 0, 6 )
+
+[node name="TranslationLabel" type="Label" parent="UI"]
+margin_top = 10.0
+margin_right = 128.0
+margin_bottom = 24.0
+text = "Translation Speed:"
+
+[node name="TranslationSpeed" type="HSlider" parent="UI"]
+margin_top = 28.0
+margin_right = 128.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 128, 22 )
+max_value = 200.0
+step = 5.0
+value = 100.0
+rounded = true
+tick_count = 3
+
+[node name="RotationLabel" type="Label" parent="UI"]
+margin_top = 54.0
+margin_right = 128.0
+margin_bottom = 68.0
+text = "Rotation Speed:"
+
+[node name="RotationSpeed" type="HSlider" parent="UI"]
+margin_top = 72.0
+margin_right = 128.0
+margin_bottom = 94.0
+rect_min_size = Vector2( 128, 22 )
+max_value = 200.0
+step = 5.0
+value = 100.0
+rounded = true
+tick_count = 3
+
+[node name="SpacerMid" type="Control" parent="UI"]
+margin_top = 98.0
+margin_right = 128.0
+margin_bottom = 100.0
+rect_min_size = Vector2( 0, 2 )
+
+[node name="ControlType" type="OptionButton" parent="UI"]
+margin_top = 104.0
+margin_right = 128.0
+margin_bottom = 128.0
+rect_min_size = Vector2( 128, 24 )
+text = "Object Mode"
+items = [ "Object Mode", null, false, 0, null, "Camera Mode", null, false, 1, null ]
+selected = 0
+
+[node name="SpacerBottom" type="Control" parent="UI"]
+margin_top = 132.0
+margin_right = 128.0
+margin_bottom = 1080.0
+size_flags_horizontal = 3
+size_flags_vertical = 3

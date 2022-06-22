@@ -13,6 +13,7 @@ For manual install, download the `addons` folder from this repository and copy i
 
 * Place the `addons` folder, with all contents, into your Godot project root directory.
 * To enable the plug-in, click `Project` `Project Settings` `Plugins` and check `Enable` next to the `Godot Space Mouse` entry.
+* Use the `Space` dock in the editor to adjust speed or change to object or camera control.
 * The 3Dconnexion driver is not needed on any OS. However, if you're on Windows, and have the driver installed, please first open the Godot editor, then open the 3Dconnexion app. You'll see a pop-up with the name of the Godot editor executable. Click `Advanced Settings`, then disable all navigation and zoom controls, as these can conflict with the viewport controls.
 * On Linux you will need to allow HID access via udev rules. First, download the file `70-space-mouse.rules` and place this file in the correct directory for your distro, such as `/etc/udev/rules.d/`. Then replug your Space Mouse hardware or run `sudo udevadm control --reload-rules && sudo udevadm trigger` to update the rules.
 * For macOS, you must uninstall the 3Dconnexion drivers, as they're incompatible with the plug-in.

@@ -5,6 +5,8 @@ extends EditorPlugin
 
 # space mouse library interface
 onready var spacemouse = preload("res://addons/spacemouse/bin/spacemouse.gdns").new()
+# scene for the configuration dock
+var space_dock = null
 # if the device is connected
 var connected = false
 # currently selected object
@@ -25,11 +27,56 @@ var camera_origin = Vector3.ZERO
 var offset_speed = 1.0;
 # convert raw values into godot axis format
 const flip = Vector3(-1.0, 1.0, -1.0)
+# default speeds (modified by ui)
+const base_translate_speed = 0.16
+const base_rotate_speed = 0.0275
 # main speed control for motion updates
-const translate_speed = 0.16
-const rotate_speed = 0.0275
+var translate_speed = base_translate_speed
+var rotate_speed = base_rotate_speed
 # sets viewport camera to the first one
 const camera_index = 0
+# node to access configuration ui
+var translation_speed_ui = null
+var rotation_speed_ui = null
+var control_type_ui = null
+# name for control type
+const ControlType = {OBJECT_TYPE = 0, CAMERA_TYPE = 1}
+# object or camera control
+var control_type = ControlType.OBJECT_TYPE
+# adjust fly camera translation
+const adjust_translation = 0.24
+const adjust_rotation = 0.98
+
+
+# on start add the configuration dock
+func _enter_tree():
+	# instance the dock
+	space_dock = preload("res://addons/spacemouse/SpaceDock.tscn").instance()
+	# attach signals for ui controls
+	translation_speed_ui = space_dock.get_node("UI/TranslationSpeed")
+	translation_speed_ui.connect("value_changed", self, "update_config")
+	rotation_speed_ui = space_dock.get_node("UI/RotationSpeed")
+	rotation_speed_ui.connect("value_changed", self, "update_config")
+	control_type_ui = space_dock.get_node("UI/ControlType")
+	control_type_ui.connect("item_selected", self, "update_config")
+	# add ui dock to the editor slot
+	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_BL, space_dock)
+
+# update the controls on ui changes
+func update_config(val):
+	# scale the translation and rotation speeds
+	translate_speed = base_translate_speed * (translation_speed_ui.value * 0.01)
+	rotate_speed = base_rotate_speed * (rotation_speed_ui.value * 0.01)
+	# toggle camera control type
+	control_type = control_type_ui.selected
+	
+# cleanup on exit
+func _exit_tree():
+	# remove the dock
+	remove_control_from_docks(space_dock)
+	# free memory
+	if is_instance_valid(space_dock):
+		space_dock.queue_free()
 
 # setup global parameters and connect to device
 func _ready():
@@ -66,22 +113,37 @@ func _process(delta):
 		# save the camera origin then center at zero for accurate rotation
 		camera_origin = camera_transform.origin
 		camera_transform.origin = Vector3.ZERO
-		# make translation slower the closer you get to the pivot point
-		offset_speed = (select_origin.distance_to(camera_origin) / 8.0) + 0.01
-		offset_speed = clamp(offset_speed, 0.01, 8.0)
-		# transform translation into camera local space
-		space_translation = camera_transform.xform(space_translation)
-		# adjust the raw readings into reasonable speeds and apply delta
-		space_translation *= translate_speed * offset_speed * delta;
-		space_rotation *= rotate_speed * delta
-		# move the camera by the latest translation but remove the offset from the pivot
-		camera_transform.origin += space_translation + camera_origin - select_origin
-		# rotate the camera by the latest rotation as normal
-		camera_transform = camera_transform.rotated(camera_transform.basis.x.normalized(), space_rotation.x)
-		camera_transform = camera_transform.rotated(camera_transform.basis.y.normalized(), space_rotation.y)
-		camera_transform = camera_transform.rotated(camera_transform.basis.z.normalized(), space_rotation.z)
-		# adjust the camera back to the real location from the pivot point
-		camera_transform.origin += select_origin
+		# object control type
+		if control_type == ControlType.OBJECT_TYPE:
+			# make translation slower the closer you get to the pivot point
+			offset_speed = (select_origin.distance_to(camera_origin) / 8.0) + 0.01
+			offset_speed = clamp(offset_speed, 0.01, 8.0)
+			# transform translation into camera local space
+			space_translation = camera_transform.xform(space_translation)
+			# adjust the raw readings into reasonable speeds and apply delta
+			space_translation *= translate_speed * offset_speed * delta;
+			space_rotation *= rotate_speed * delta
+			# move the camera by the latest translation but remove the offset from the pivot
+			camera_transform.origin += space_translation + camera_origin - select_origin
+			# rotate the camera by the latest rotation as normal
+			camera_transform = camera_transform.rotated(camera_transform.basis.x.normalized(), space_rotation.x)
+			camera_transform = camera_transform.rotated(camera_transform.basis.y.normalized(), space_rotation.y)
+			camera_transform = camera_transform.rotated(camera_transform.basis.z.normalized(), space_rotation.z)
+			# adjust the camera back to the real location from the pivot point
+			camera_transform.origin += select_origin
+		# camera control type
+		elif control_type == ControlType.CAMERA_TYPE:
+			# adjust the raw readings into reasonable speeds and apply delta
+			space_translation *= translate_speed * adjust_translation * delta;
+			space_rotation *= rotate_speed * adjust_rotation * delta
+			# rotate the camera in place
+			camera_transform = camera_transform.rotated(camera_transform.basis.x.normalized(), -space_rotation.x)
+			camera_transform = camera_transform.rotated(camera_transform.basis.y.normalized(), -space_rotation.y)
+			camera_transform = camera_transform.rotated(camera_transform.basis.z.normalized(), -space_rotation.z)
+			# transform translation into camera local space
+			space_translation = camera_transform.xform(space_translation)
+			# move the camera back to the original position
+			camera_transform.origin = camera_origin - space_translation
 		# apply the updated temporary transform to the actual viewport camera
 		camera.transform = camera_transform
 		
