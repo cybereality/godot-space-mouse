@@ -46,7 +46,8 @@ var control_type = ControlType.OBJECT_TYPE
 # adjust fly camera translation
 const adjust_translation = 0.24
 const adjust_rotation = 0.98
-
+# stored configuration
+var config_data = {}
 
 # on start add the configuration dock
 func _enter_tree():
@@ -61,6 +62,8 @@ func _enter_tree():
 	control_type_ui.connect("item_selected", self, "update_config")
 	# add ui dock to the editor slot
 	add_control_to_dock(EditorPlugin.DOCK_SLOT_RIGHT_BL, space_dock)
+	# load the saved configuration
+	load_config_data()
 
 # update the controls on ui changes
 func update_config(val):
@@ -70,8 +73,37 @@ func update_config(val):
 	# toggle camera control type
 	control_type = control_type_ui.selected
 	
+# save current configuration
+func save_config_data():
+	# get the values for from the ui
+	config_data["translation_speed"] = translation_speed_ui.value
+	config_data["rotation_speed"] = rotation_speed_ui.value
+	config_data["control_type"] = control_type_ui.selected
+	# open the configuration save file
+	var config_file = File.new()
+	config_file.open("user://spacemouse.config", File.WRITE)
+	# write the data for the configuration
+	config_file.store_var(config_data)
+
+# load saved settings
+func load_config_data():
+	# attempt to load and exit is file not found
+	var config_file = File.new()
+	if not config_file.file_exists("user://spacemouse.config"):
+		return
+	config_file.open("user://spacemouse.config", File.READ)
+	# store the loaded config values
+	config_data = config_file.get_var()
+	# set the ui to the loaded config
+	if config_data.has_all(["translation_speed", "rotation_speed", "control_type"]):
+		translation_speed_ui.value = config_data["translation_speed"]
+		rotation_speed_ui.value = config_data["rotation_speed"]
+		control_type_ui.selected = config_data["control_type"]
+	
 # cleanup on exit
 func _exit_tree():
+	# save the settings
+	save_config_data()
 	# remove the dock
 	remove_control_from_docks(space_dock)
 	# free memory
