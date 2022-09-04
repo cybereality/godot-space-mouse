@@ -60,7 +60,7 @@ margin_right = 128.0
 margin_bottom = 128.0
 rect_min_size = Vector2( 128, 24 )
 text = "Object Mode"
-items = [ "Object Mode", null, false, 0, null, "Camera Mode", null, false, 1, null ]
+items = [ "Object Mode", null, false, 0, null, "Camera Mode", null, false, 1, null, "Helicopter Mode", null, false, 2, null ]
 selected = 0
 
 [node name="SpacerBottom" type="Control" parent="UI"]
