@@ -40,7 +40,7 @@ var translation_speed_ui = null
 var rotation_speed_ui = null
 var control_type_ui = null
 # name for control type
-const ControlType = {OBJECT_TYPE = 0, CAMERA_TYPE = 1}
+const ControlType = {OBJECT_TYPE = 0, CAMERA_TYPE = 1, HELICOPTER_TYPE=2}
 # object or camera control
 var control_type = ControlType.OBJECT_TYPE
 # adjust fly camera translation
@@ -172,6 +172,19 @@ func _process(delta):
 			camera_transform = camera_transform.rotated(camera_transform.basis.x.normalized(), -space_rotation.x)
 			camera_transform = camera_transform.rotated(camera_transform.basis.y.normalized(), -space_rotation.y)
 			camera_transform = camera_transform.rotated(camera_transform.basis.z.normalized(), -space_rotation.z)
+			# transform translation into camera local space
+			space_translation = camera_transform.xform(space_translation)
+			# move the camera back to the original position
+			camera_transform.origin = camera_origin - space_translation
+		elif control_type == ControlType.HELICOPTER_TYPE:
+			# adjust the raw readings into reasonable speeds and apply delta
+			space_translation *= translate_speed * adjust_translation * delta;
+			space_rotation *= rotate_speed * adjust_rotation * delta
+			# rotate the camera in place
+			# rotation is absolute for vertical axis to keep the horizon level
+			camera_transform = camera_transform.rotated(Vector3.UP, -space_rotation.y)
+			# Permits to tilt (dive up/down)
+			camera_transform = camera_transform.rotated(camera_transform.basis.x.normalized(), -space_rotation.x)
 			# transform translation into camera local space
 			space_translation = camera_transform.xform(space_translation)
 			# move the camera back to the original position
